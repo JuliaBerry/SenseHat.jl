@@ -1,7 +1,11 @@
-# SenseHat
+# SenseHat.jl
 
-[![Build Status](https://travis-ci.org/simonbyrne/SenseHat.jl.svg?branch=master)](https://travis-ci.org/simonbyrne/SenseHat.jl)
+SenseHat.jl is a Julia library for interacting with the Raspberry Pi [Sense HAT](https://www.raspberrypi.org/products/sense-hat/).
 
-[![Coverage Status](https://coveralls.io/repos/simonbyrne/SenseHat.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/simonbyrne/SenseHat.jl?branch=master)
+## LED matrix
 
-[![codecov.io](http://codecov.io/github/simonbyrne/SenseHat.jl/coverage.svg?branch=master)](http://codecov.io/github/simonbyrne/SenseHat.jl?branch=master)
+The `led_display(X)` function will display an 8&times;8 matrix of colors on the LED matrix (see [ColorTypes.jl](https://github.com/JuliaGraphics/ColorTypes.jl):
+
+    led_display(SenseHat.JULIA_LOGO)
+    sleep(1)
+    led_clear()
