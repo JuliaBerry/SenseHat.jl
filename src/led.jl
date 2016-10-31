@@ -65,7 +65,7 @@ end
 """
     led_clear()
 
-Clears the SenseHat LED matrix.
+Sets the SenseHat LED matrix to all black.
 """
 function led_clear()
     open(LED_FB_DEV, "w") do fb
