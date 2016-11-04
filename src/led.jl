@@ -1,18 +1,23 @@
+module LED
+export led_display, led_clear, RGB565
 using ColorTypes, FixedPointNumbers
 
-function _led_fb_dev()
-    for devname in readdir("/sys/class/graphics")
-        sysfname = joinpath("/sys/class/graphics",devname,"name")
-        if startswith(devname, "fb") && isfile(sysfname)
-            if startswith(readstring(sysfname),"RPi-Sense FB")
-                return joinpath("/dev",devname)
+function _led_fb_device()
+    try
+        for devname in readdir("/sys/class/graphics")
+            sysfname = joinpath("/sys/class/graphics",devname,"name")
+            if startswith(devname, "fb") && isfile(sysfname)
+                if startswith(readstring(sysfname),"RPi-Sense FB")
+                    return joinpath("/dev",devname)
+                end
             end
         end
+    catch e
     end
     error("Sense Hat not found.")
 end
 
-const LED_FB_DEV = _led_fb_dev()
+const LED_FB_DEVICE = _led_fb_device()
 
 
 typealias U5 UFixed{UInt8,5}
@@ -53,7 +58,7 @@ See also:
 """
 function led_display(X)
     size(X) == (8,8) || throw(DimensionMismatch("Can only display 8x8 images"))
-    open(LED_FB_DEV, "w") do fb
+    open(LED_FB_DEVICE, "w") do fb
         for j = 1:8
             for i = 1:8
                 write(fb, convert(RGB565, X[i,j]).data)
@@ -68,7 +73,7 @@ end
 Sets the SenseHat LED matrix to all black.
 """
 function led_clear()
-    open(LED_FB_DEV, "w") do fb
+    open(LED_FB_DEVICE, "w") do fb
         for j = 1:8
             for i = 1:8
                 write(fb, UInt16(0))
@@ -76,3 +81,5 @@ function led_clear()
         end
     end
 end
+
+end # module
