@@ -1,7 +1,6 @@
 module Stick
 
-export UP, LEFT, RIGHT, DOWN, MIDDLE, RELEASE, PRESS, HOLD,
-   StickEvent, StickEventTask
+export StickEvent, StickEventTask
 
 function _stick_input_device()
     try
@@ -60,26 +59,30 @@ Base.convert(::Type{StickEvent}, r::StickEventRaw) =
     StickEvent(Dates.unix2datetime(r.tv_sec + r.tv_usec/1_000_000),
                Direc(r.ev_direc), State(r.ev_state))
 
-"""
+function __init__()
+    
+    """
     StickEventTask
 
-This is a `Task` that produces `StickEvent`s when the joystick on the Sense HAT is manipulated. It will block until new `StickEvent`s occur.
+    This is a `Task` that produces `StickEvent`s when the joystick on the Sense HAT is manipulated. It will block until new `StickEvent`s occur.
 
-A typical usage will be to create a new task which will call this asynchronously, e.g. the following will call the function `f(::StickEvent)` for each event:
-```
-@schedule for e in StickEventTask
-     f(e)
-end
-```
-"""
-const StickEventTask = @task open(STICK_INPUT_DEVICE) do dev
-    fddev = RawFD(fd(dev))
-    while true
-        wait(fddev, readable=true)
-        s = read(dev, StickEventRaw)
-        if s.ev_type == EV_KEY
-            produce(StickEvent(s))
+    A typical usage will be to create a new task which will call this asynchronously, e.g. the following will call the function `f(::StickEvent)` for each event:
+        ```
+    @schedule for e in StickEventTask
+        f(e)
+    end
+    ```
+        """
+    global const StickEventTask = @task open(STICK_INPUT_DEVICE) do dev
+        fddev = RawFD(fd(dev))
+        while true
+            wait(fddev, readable=true)
+            s = read(dev, StickEventRaw)
+            if s.ev_type == EV_KEY
+                produce(StickEvent(s))
+            end
         end
     end
 end
+
 end # module
