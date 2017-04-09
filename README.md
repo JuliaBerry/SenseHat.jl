@@ -29,7 +29,7 @@ In the `Stick` module there is `readstick()` which will block until the joystick
 
     e = readstick()
 
-For asynchronous use, `sticktask() will create a `Task` for producing `StickEvent`s, e.g.
+For asynchronous use, `sticktask()` will create a `Task` for producing `StickEvent`s, e.g.
 
     using SenseHat
 
