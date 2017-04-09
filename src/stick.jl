@@ -1,6 +1,6 @@
 module Stick
 
-export StickEvent, StickEventTask
+export StickEvent, readstick, sticktask
 
 function _stick_input_device()
     try
