@@ -10,13 +10,16 @@ SenseHat.jl requires the Raspbian `sense-hat` package:
 
 ## LED matrix
 
-The `led_display(X)` function will display an 8&times;8 matrix of colors on the LED matrix (see [ColorTypes.jl](https://github.com/JuliaGraphics/ColorTypes.jl)). `led_clear()` will set all the LEDs to black.
+The main interface is the `led_matrix()` function, which creates an 8&times;8 array of RGB values (from [ColorTypes.jl](https://github.com/JuliaGraphics/ColorTypes.jl)) which is memory-mapped to the frame buffer of the LED matrix.
 
     using SenseHat
-
-    led_display(SenseHat.JULIA_LOGO)
-    sleep(1)
-    led_clear()
+    using ColorTypes
+    
+    const LED = led_matrix()
+    
+    LED[:] = SenseHat.JULIA_LOGO
+    sleep(3)
+    LED[:] = RGB(0,0,0)
 
 ## Joystick
 

@@ -1,5 +1,6 @@
 module LED
-export led_display, led_clear, RGB565
+export led_matrix, RGB565
+
 using ColorTypes, FixedPointNumbers
 
 function _led_fb_device()
@@ -45,6 +46,33 @@ ColorTypes.ccolor{Csrc<:Colorant}(::Type{RGB565}, ::Type{Csrc}) = RGB565
 ColorTypes.base_color_type(::Type{RGB565}) = RGB565
 
 """
+    led_matrix()
+
+Returns an 8x8 matrix of `RGB565` elements that is memory-mapped to the Sense HAT LED Matrix.
+
+While it is possible to invoke the function multiple times (each returning different
+arrays), it is generally preferable to assign it once into a `const` variable so as to
+minimise the number of open file handlers.
+
+# Example
+```
+using SenseHat
+using ColorTypes
+
+const LED = led_matrix()
+
+LED[:] = SenseHat.JULIA_LOGO
+sleep(3)
+LED[:] = RGB(0,0,0)
+```
+
+"""
+led_matrix() = Mmap.mmap(LED_FB_DEVICE, Array{RGB565,2}, (8,8); grow=false)
+
+
+
+
+"""
     led_display(X)
 
 Display an image `X` on the SenseHat LED matrix.
@@ -57,6 +85,7 @@ See also:
 * `led_clear` for clearing the LED matrix.
 """
 function led_display(X)
+    Base.depwarn("`led_display(X)` has been deprecated, use `led_matrix()[:] = X` instead.", :led_display)
     size(X) == (8,8) || throw(DimensionMismatch("Can only display 8x8 images"))
     open(LED_FB_DEVICE, "w") do fb
         for j = 1:8
@@ -73,6 +102,7 @@ end
 Sets the SenseHat LED matrix to all black.
 """
 function led_clear()
+    Base.depwarn("`led_clear()` has been deprecated, use `led_matrix()[:] = SenseHat.RGB565(0,0,0)` instead.", :led_display)
     open(LED_FB_DEVICE, "w") do fb
         for j = 1:8
             for i = 1:8

@@ -1,7 +1,7 @@
 __precompile__()
 module SenseHat
 
-export led_display, led_clear,
+export led_matrix, RGB565,
     Stick, StickEvent, sticktask, readstick
 
 include("led.jl")
