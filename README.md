@@ -20,15 +20,21 @@ The `led_display(X)` function will display an 8&times;8 matrix of colors on the 
 
 ## Joystick
 
-In the `Stick` module there is a `StickEventTask` which will produce `StickEvent`s whenever the joystick is manipulated. This will typically be used asynchronously, e.g.
+In the `Stick` module there is `readstick()` which will block until the joystick is manipulated, returning a `StickEvent`:
 
     using SenseHat
 
-    @schedule for e in StickEventTask
+    e = readstick()
+
+For asynchronous use, `sticktask() will create a `Task` for producing `StickEvent`s, e.g.
+
+    using SenseHat
+
+    @schedule for e in sticktask()
         println(e)
     end
 
-will create a new task that prints the events and adds it to the scheduler. See the help for `StickEvent` and `StickEventTask` for more details.
+will create a new task that prints the event, then and add it to the scheduler. See the help for `StickEvent` and `sticktask` for more details.
 
 ## Sensors
 

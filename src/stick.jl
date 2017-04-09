@@ -46,8 +46,12 @@ Base.read(io::IO, ::Type{StickEventRaw}) = read(io, Ref{StickEventRaw}())[]
 The data from a joystick event. The type contains the following fields:
 
 * `timestamp` : `DateTime` of when the event occurred.
-* `direc` : the direcion of the event (`UP`, `DOWN`, `LEFT`, `RIGHT`, `MIDDLE`). `MIDDLE` occurs when the button is pressed down.
+
+* `direc` : the direcion of the event, either `UP`, `DOWN`, `LEFT`, `RIGHT`, `MIDDLE` (`MIDDLE`
+  occurs when the button is pressed down).
+
 * `state` : the state of the event (`PRESS`, `RELEASE`, `HOLD`).
+
 """
 immutable StickEvent
     timestamp::DateTime
@@ -59,21 +63,44 @@ Base.convert(::Type{StickEvent}, r::StickEventRaw) =
     StickEvent(Dates.unix2datetime(r.tv_sec + r.tv_usec/1_000_000),
                Direc(r.ev_direc), State(r.ev_state))
 
-function __init__()
-    
-    """
-    StickEventTask
+"""
+    readstick()
 
-    This is a `Task` that produces `StickEvent`s when the joystick on the Sense HAT is manipulated. It will block until new `StickEvent`s occur.
+This reads a single `StickEvent` from the joystick on the Sense HAT. This will block until an event occurs.
 
-    A typical usage will be to create a new task which will call this asynchronously, e.g. the following will call the function `f(::StickEvent)` for each event:
-        ```
-    @schedule for e in StickEventTask
-        f(e)
+See also `sticktask()` which may be better for reading in a loop.
+"""
+function readstick()
+    open(STICK_INPUT_DEVICE) do dev
+        fddev = RawFD(fd(dev))
+        while true
+            wait(fddev, readable=true)
+            s = read(dev, StickEventRaw)
+            if s.ev_type == EV_KEY
+                return StickEvent(s)
+            end
+        end
     end
-    ```
-        """
-    global const StickEventTask = @task open(STICK_INPUT_DEVICE) do dev
+end
+
+"""
+    sticktask()
+
+This is a `Task` that produces `StickEvent`s when the joystick on the Sense HAT is
+manipulated. It will block until new `StickEvent`s occur.
+
+A typical usage will be to create a new task which will call this asynchronously, e.g. the
+following will call the function `f(::StickEvent)` for each event:
+
+```
+@schedule for e in sticktask()
+    f(e)
+end
+```
+
+"""
+function sticktask()
+    @task open(STICK_INPUT_DEVICE) do dev
         fddev = RawFD(fd(dev))
         while true
             wait(fddev, readable=true)
@@ -84,5 +111,6 @@ function __init__()
         end
     end
 end
+
 
 end # module
