@@ -20,7 +20,7 @@ function HTS221_calibrate()
     
     m_t = (t1_C - t0_C)/(Float64(t1_raw) - Float64(t0_raw))
     k_t = t1_C - m_t*t1_raw
-    HTS221_t_coef[] = (t_m, t_k)
+    HTS221_t_coef[] = (m_t, k_t)
 
     ## read humidity calibration data
     h0_raw = Int16(smbus_read(0x37))<<8 | smbus_read(0x36)
@@ -31,7 +31,7 @@ function HTS221_calibrate()
 
     m_h = (h0_rH - h1_rH)/(Float64(h1_raw) - Float64(h0_raw))
     k_h = h1_rH - m_h*h1_raw
-    HTS221_h_coef[] = (h_m, h_k)
+    HTS221_h_coef[] = (m_h, k_h)
 
     return nothing
 end
