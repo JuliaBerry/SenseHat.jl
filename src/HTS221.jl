@@ -26,10 +26,10 @@ function HTS221_calibrate()
     h0_raw = Int16(smbus_read(0x37))<<8 | smbus_read(0x36)
     h1_raw = Int16(smbus_read(0x3b))<<8 | smbus_read(0x3a)
 
-    h0_rH = Float64(smbus_read(0x30))/200
-    h1_rH = Float64(smbus_read(0x31))/200
+    h0_rH = Float64(smbus_read(0x30))/2
+    h1_rH = Float64(smbus_read(0x31))/2
 
-    m_h = (h0_rH - h1_rH)/(Float64(h1_raw) - Float64(h0_raw))
+    m_h = (h1_rH - h0_rH)/(Float64(h1_raw) - Float64(h0_raw))
     k_h = h1_rH - m_h*h1_raw
     HTS221_h_coef[] = (m_h, k_h)
 
@@ -72,12 +72,22 @@ function HTS221_raw_humidity()
     return h_raw
 end
 
+"""
+    HTS221_temp()
 
+Returns the temperature (in °C) from the HTS221 sensor.
+"""
 function HTS221_temp()
     (m_t, k_t) = HTS221_t_coef[]
     t_raw = HTS221_raw_temp()
     m_t*t_raw + k_t
 end
+
+"""
+    HTS221_humidity()
+
+Returns the relative humidity (as a percentage) from the HTS221 sensor.
+"""
 function HTS221_humidity()
     (m_h, k_h) = HTS221_h_coef[]
     h_raw = HTS221_raw_humidity()
