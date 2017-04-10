@@ -1,4 +1,7 @@
 module LED
+
+import ..ioctl
+
 export led_matrix, RGB565
 
 using ColorTypes, FixedPointNumbers
@@ -18,7 +21,13 @@ function _led_fb_device()
     error("Sense Hat not found.")
 end
 
-const LED_FB_DEVICE = _led_fb_device()
+const LED_FB_DEVICE_PATH = _led_fb_device()
+const LED_FB_DEVICE = Ref{IOStream}()
+
+function __init__()
+    LED_FB_DEVICE[] = open(LED_FB_DEVICE_PATH,"w+")
+end
+
 
 
 typealias U5 UFixed{UInt8,5}
@@ -45,6 +54,8 @@ ColorTypes.blue(c::RGB565) = U5(c.data & 0x1f, Val{true})
 ColorTypes.ccolor{Csrc<:Colorant}(::Type{RGB565}, ::Type{Csrc}) = RGB565
 ColorTypes.base_color_type(::Type{RGB565}) = RGB565
 
+
+
 """
     led_matrix()
 
@@ -55,6 +66,7 @@ arrays), it is generally preferable to assign it once into a `const` variable so
 minimise the number of open file handlers.
 
 # Example
+
 ```
 using SenseHat
 using ColorTypes
@@ -67,7 +79,52 @@ LED[:] = RGB(0,0,0)
 ```
 
 """
-led_matrix() = Mmap.mmap(LED_FB_DEVICE, Array{RGB565,2}, (8,8); grow=false)
+led_matrix() = Mmap.mmap(LED_FB_DEVICE[], Array{RGB565,2}, (8,8); grow=false)
+
+
+
+
+const FBIO_GET_GAMMA = 61696
+const FBIO_SET_GAMMA = 61697
+const FBIO_RESET_GAMMA = 61698
+
+@enum(GammaScale, GAMMA_DEFAULT, GAMMA_LOW, GAMMA_USER)
+
+"""
+    getgamma()
+
+Return the current gamma correction table for the Sense HAT LED matrix, as a vector of 32
+`UFixed{UInt8,5}` numbers.
+
+"""
+function getgamma()
+    buffer = zeros(UInt8, 32)
+    ioctl(LED_FB_DEVICE[], FBIO_GET_GAMMA, buffer)
+    return buffer
+end
+
+"""
+    setgamma(v::GammaScale)
+    setgamma(table::Vector)
+
+Set the gamma correction for the Sense HAT LED matrix. This can either be one of the
+predefined settings (`GAMMA_DEFAULT`, `GAMMA_LOW`, `GAMMA_USER`) or a table of values
+between 0 and 1 (the actual values will be converted to `UFixed{UInt8, 5}`).
+
+"""
+function setgamma end
+
+function setgamma(v::GammaScale)
+    ioctl(LED_FB_DEVICE[], FBIO_RESET_GAMMA, Cint(v))
+    return nothing
+end
+
+function setgamma(table::Vector{U5})
+    length(table) == 32 || error("Table must contain 32 values.")
+    ioctl(LED_FB_DEVICE[], FBIO_SET_GAMMA, table)
+    return nothing
+end
+setgamma(table::AbstractVector) = setgamma(convert(Vector{U5}, table))
 
 
 
