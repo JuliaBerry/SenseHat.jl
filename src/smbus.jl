@@ -19,13 +19,15 @@ end
 
 function smbus_read(cmd::UInt8)
     buffer = Ref(UInt8(0))
-    data = SMBusData(I2C_SMBUS_READ, cmd, I2C_SMBUS_BYTE_DATA, Base.unsafe_conver(Ptr{UInt8}, buffer))
+    data = SMBusData(I2C_SMBUS_READ, cmd, I2C_SMBUS_BYTE_DATA,
+                     Base.unsafe_convert(Ptr{UInt8}, buffer))
     ioctl(I2C_DEVICE[], I2C_SMBUS, Ref(data))
     return buffer[]
 end
 function smbus_write(cmd::UInt8, val::UInt8)
     buffer = Ref(val)
-    data = SMBusData(I2C_SMBUS_WRITE, cmd, I2C_SMBUS_BYTE_DATA, Base.unsafe_conver(Ptr{UInt8}, buffer))
+    data = SMBusData(I2C_SMBUS_WRITE, cmd, I2C_SMBUS_BYTE_DATA,
+                     Base.unsafe_convert(Ptr{UInt8}, buffer))
     ioctl(I2C_DEVICE[], I2C_SMBUS, Ref(data))
     return 1
 end
