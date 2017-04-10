@@ -15,8 +15,8 @@ function HTS221_calibrate()
 
     # known °C
     u = smbus_read(0x35)
-    t0_C = Float64(Int16(u & 0b0011) << 8 | smbus_read(0x32)))/8
-    t1_C = Float64(Int16(u & 0b1100) << 6 | smbus_read(0x33)))/8
+    t0_C = Float64(Int16(u & 0b0011) << 8 | smbus_read(0x32))/8
+    t1_C = Float64(Int16(u & 0b1100) << 6 | smbus_read(0x33))/8
     
     m_t = (t1_C - t0_C)/(Float64(t1_raw) - Float64(t0_raw))
     k_t = t1_C - m_t*t1_raw
