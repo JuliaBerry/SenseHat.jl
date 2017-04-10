@@ -3,7 +3,9 @@
 
 function LPS25H_pressure()
     setaddr(LPS25H_ADDRESS)
-    
+    CTRL_REG1 = 0x20
+    CTRL_REG2 = 0x21
+
     smbus_write(CTRL_REG1, 0x00) # power down
     smbus_write(CTRL_REG1, 0x84) # power on, block update
     smbus_write(CTRL_REG2, 0x01) # one-shot aquisition
@@ -21,7 +23,9 @@ end
 
 function LPS25H_temp()
     setaddr(LPS25H_ADDRESS)
-    
+    CTRL_REG1 = 0x20
+    CTRL_REG2 = 0x21
+
     smbus_write(CTRL_REG1, 0x00) # power down
     smbus_write(CTRL_REG1, 0x84) # power on, block update
     smbus_write(CTRL_REG2, 0x01) # one-shot aquisition
