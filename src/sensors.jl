@@ -23,6 +23,6 @@ function setaddr(addr::UInt8)
 end
 
 include("HTS221.jl")
-
+include("LPS25H.jl")
 
 end # module
