@@ -6,7 +6,7 @@ export led_matrix, RGB565,
     pressure, temperature, humidity
 
 
-include("utils.jl")
+include("ioctl.jl")
 
 include("led.jl")
 using .LED
