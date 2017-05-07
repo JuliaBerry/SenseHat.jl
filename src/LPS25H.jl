@@ -1,6 +1,11 @@
 # LPS25H pressure/temperature sensor
 # See http://www.st.com/resource/en/datasheet/lps25h.pdf
 
+"""
+    LPS25H_pressure()
+
+The atmospheric pressure (in millibars) from the LPS25H sensor.
+"""
 function LPS25H_pressure()
     setaddr(LPS25H_ADDRESS)
     CTRL_REG1 = 0x20
@@ -21,7 +26,12 @@ function LPS25H_pressure()
     return pressure
 end
 
-function LPS25H_temp()
+"""
+    HTS221_temperature()
+
+The temperature (in °C) from the LPS25H sensor.
+"""
+function LPS25H_temperature()
     setaddr(LPS25H_ADDRESS)
     CTRL_REG1 = 0x20
     CTRL_REG2 = 0x21

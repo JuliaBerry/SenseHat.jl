@@ -1,4 +1,6 @@
 module Sensors
+export humidity, temperature, pressure
+
 
 const I2C_DEVICE_PATH = "/dev/i2c-1"
 const I2C_DEVICE = Ref{IOStream}()
@@ -24,5 +26,28 @@ end
 
 include("HTS221.jl")
 include("LPS25H.jl")
+
+
+"""
+    humidity()
+
+The relative humidity (as a percentage between 0 and 100).
+"""
+humidity()    = HTS221_humidity()
+
+"""
+    temperature()
+
+The temperature (in °C).
+"""
+temperature() = HTS221_temperature()
+
+"""
+    pressure()
+
+The atmospheric pressure (in millibars).
+"""
+pressure()    = LPS25H_pressure()
+
 
 end # module

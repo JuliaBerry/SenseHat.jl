@@ -2,7 +2,8 @@ __precompile__()
 module SenseHat
 
 export led_matrix, RGB565,
-    Stick, StickEvent, sticktask, readstick
+    Stick, StickEvent, sticktask, readstick,
+    pressure, temperature, humidity
 
 
 include("utils.jl")

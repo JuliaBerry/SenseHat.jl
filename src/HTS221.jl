@@ -10,8 +10,8 @@ function HTS221_calibrate()
 
     ## read temp calibration data
     # raw values
-    t0_raw = Int16(smbus_read(0x3d))<<8 | smbus_read(0x3c)
-    t1_raw = Int16(smbus_read(0x3f))<<8 | smbus_read(0x3e)
+    t0_raw = smbus_read_pair(0x3c)
+    t1_raw = smbus_read_pair(0x3e)
 
     # known °C
     u = smbus_read(0x35)
@@ -23,8 +23,8 @@ function HTS221_calibrate()
     HTS221_t_coef[] = (m_t, k_t)
 
     ## read humidity calibration data
-    h0_raw = Int16(smbus_read(0x37))<<8 | smbus_read(0x36)
-    h1_raw = Int16(smbus_read(0x3b))<<8 | smbus_read(0x3a)
+    h0_raw = smbus_read_pair(0x36)
+    h1_raw = smbus_read_pair(0x3a)
 
     h0_rH = Float64(smbus_read(0x30))/2
     h1_rH = Float64(smbus_read(0x31))/2
@@ -49,7 +49,7 @@ function HTS221_raw_temp()
         sleep(0.025)
         smbus_read(CTRL_REG2) == 0 && break # check if finished
     end
-    t_raw = Int16(smbus_read(0x2b))<<8 | smbus_read(0x2a)
+    t_raw = smbus_read_pair(0x2a)
     smbus_write(CTRL_REG1, 0x00) # power down
     return t_raw
 end
@@ -67,17 +67,17 @@ function HTS221_raw_humidity()
         sleep(0.025)
         smbus_read(CTRL_REG2) == 0 && break # check if finished
     end
-    h_raw = Int16(smbus_read(0x29))<<8 | smbus_read(0x28)
+    h_raw = smbus_read_pair(0x28)
     smbus_write(CTRL_REG1, 0x00) # power down
     return h_raw
 end
 
 """
-    HTS221_temp()
+    HTS221_temperature()
 
-Returns the temperature (in °C) from the HTS221 sensor.
+The temperature (in °C) from the HTS221 sensor.
 """
-function HTS221_temp()
+function HTS221_temperature()
     (m_t, k_t) = HTS221_t_coef[]
     t_raw = HTS221_raw_temp()
     m_t*t_raw + k_t
@@ -86,7 +86,7 @@ end
 """
     HTS221_humidity()
 
-Returns the relative humidity (as a percentage) from the HTS221 sensor.
+The relative humidity (as a percentage) from the HTS221 sensor.
 """
 function HTS221_humidity()
     (m_h, k_h) = HTS221_h_coef[]
