@@ -1,7 +1,7 @@
 __precompile__()
 module SenseHat
 
-export led_matrix, RGB565,
+export led_matrix, RGB565, led_clear,
     Stick, StickEvent, sticktask, readstick,
     pressure, temperature, humidity
 

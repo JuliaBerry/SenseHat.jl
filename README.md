@@ -10,7 +10,10 @@ SenseHat.jl requires the Raspbian `sense-hat` package:
 
 ## LED matrix
 
-The main interface is the `led_matrix()` function, which creates an 8&times;8 array of RGB values (from [ColorTypes.jl](https://github.com/JuliaGraphics/ColorTypes.jl)) which is memory-mapped to the frame buffer of the LED matrix.
+The main interface is the `led_matrix()` function, which creates an 8&times;8 array of RGB
+values (from [ColorTypes.jl](https://github.com/JuliaGraphics/ColorTypes.jl)) which is
+memory-mapped to the frame buffer of the LED matrix. `led_clear()` is a convenience
+function for resetting the LED matrix to black.
 
     using SenseHat
     using ColorTypes
@@ -19,17 +22,19 @@ The main interface is the `led_matrix()` function, which creates an 8&times;8 ar
     
     LED[:] = SenseHat.JULIA_LOGO
     sleep(3)
-    LED[:] = RGB(0,0,0)
+    led_clear()
 
 ## Joystick
 
-In the `Stick` module there is `readstick()` which will block until the joystick is manipulated, returning a `StickEvent`:
+In the `Stick` module there is `readstick()` which will block until the joystick is
+manipulated, returning a `StickEvent`:
 
     using SenseHat
 
     e = readstick()
 
-For asynchronous use, `sticktask()` will create a `Task` for producing `StickEvent`s, e.g.
+For querying within a loop, `sticktask()` will create a `Task` that produces `StickEvent`s. Use
+with `@schedule` for asynchronous use, e.g.
 
     using SenseHat
 
@@ -37,8 +42,11 @@ For asynchronous use, `sticktask()` will create a `Task` for producing `StickEve
         println(e)
     end
 
-will create a new task that prints the event, then and add it to the scheduler. See the help for `StickEvent` and `sticktask` for more details.
+will create a new task that prints the event, then and add it to the scheduler. See the
+help for `StickEvent` and `sticktask` for more details.
 
 ## Sensors
 
-Coming soon: in the meantime, you can use the [python library](https://pythonhosted.org/sense-hat/) via [PyCall.jl](https://github.com/JuliaPy/PyCall.jl).
+`humidity()`, `temperature()` and `pressure()` will read values from the corresponding sensors.
+
+The inertial measurement unit (IMU) is not yet supported, but is coming soon. In the meantime, you can use the [python library](https://pythonhosted.org/sense-hat/) via [PyCall.jl](https://github.com/JuliaPy/PyCall.jl).

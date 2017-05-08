@@ -2,7 +2,7 @@ module LED
 
 import ..ioctl
 
-export led_matrix, RGB565
+export led_matrix, RGB565, led_clear
 
 using ColorTypes, FixedPointNumbers
 
@@ -18,7 +18,7 @@ function _led_fb_device()
         end
     catch e
     end
-    error("Sense Hat not found.")
+    error("Sense Hat device not found.")
 end
 
 const LED_FB_DEVICE_PATH = _led_fb_device()
@@ -127,30 +127,9 @@ end
 setgamma(table::AbstractVector) = setgamma(convert(Vector{U5}, table))
 
 
-
-
-"""
-    led_display(X)
-
-Display an image `X` on the SenseHat LED matrix.
-
-`X` should be an 8×8 matrix of colors (see the ColorTypes.jl package).
-
-See also:
-* `rotl90`, `rotr90` and `rot180` for rotating the image.
-* `flipdim` for reflecting the image.
-* `led_clear` for clearing the LED matrix.
-"""
 function led_display(X)
     Base.depwarn("`led_display(X)` has been deprecated, use `led_matrix()[:] = X` instead.", :led_display)
-    size(X) == (8,8) || throw(DimensionMismatch("Can only display 8x8 images"))
-    open(LED_FB_DEVICE, "w") do fb
-        for j = 1:8
-            for i = 1:8
-                write(fb, convert(RGB565, X[i,j]).data)
-            end
-        end
-    end
+    led_matrix()[:] = X
 end
 
 """
@@ -159,14 +138,7 @@ end
 Sets the SenseHat LED matrix to all black.
 """
 function led_clear()
-    Base.depwarn("`led_clear()` has been deprecated, use `led_matrix()[:] = SenseHat.RGB565(0,0,0)` instead.", :led_display)
-    open(LED_FB_DEVICE, "w") do fb
-        for j = 1:8
-            for i = 1:8
-                write(fb, UInt16(0))
-            end
-        end
-    end
+    led_matrix()[:] = SenseHat.RGB565(0,0,0)
 end
 
 end # module
