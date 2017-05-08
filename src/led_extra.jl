@@ -14,5 +14,5 @@ const JULIA_LOGO = begin
      z R R G G P P z;
      R r r R P p p P;
      R r r R P p p P;
-     z R R z z P P z]' # transpose to correct orientation
+     z R R z z P P z] |> transpose # transpose to correct orientation
 end
