@@ -138,7 +138,7 @@ end
 Sets the SenseHat LED matrix to all black.
 """
 function led_clear()
-    led_matrix()[:] = SenseHat.RGB565(0,0,0)
+    led_matrix()[:] = RGB565(0,0,0)
 end
 
 end # module
