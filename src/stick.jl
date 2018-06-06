@@ -1,6 +1,6 @@
 module Stick
 
-export StickEvent, readstick, sticktask
+export StickEvent, readstick
 
 function _stick_input_device()
     try
@@ -82,35 +82,5 @@ function readstick()
         end
     end
 end
-
-"""
-    sticktask()
-
-This is a `Task` that produces `StickEvent`s when the joystick on the Sense HAT is
-manipulated. It will block until new `StickEvent`s occur.
-
-A typical usage will be to create a new task which will call this asynchronously, e.g. the
-following will call the function `f(::StickEvent)` for each event:
-
-```
-@schedule for e in sticktask()
-    f(e)
-end
-```
-
-"""
-function sticktask()
-    @task open(STICK_INPUT_DEVICE) do dev
-        fddev = RawFD(fd(dev))
-        while true
-            wait(fddev, readable=true)
-            s = read(dev, StickEventRaw)
-            if s.ev_type == EV_KEY
-                produce(StickEvent(s))
-            end
-        end
-    end
-end
-
 
 end # module

@@ -2,7 +2,8 @@ __precompile__()
 module SenseHat
 
 export led_matrix, RGB565, led_clear,
-    Stick, StickEvent, sticktask, readstick,
+    show_char, show_message,
+    Stick, StickEvent, readstick,
     pressure, temperature, humidity
 
 
@@ -17,5 +18,8 @@ using .Stick
 
 include("sensors.jl")
 using .Sensors
+
+include("text.jl")
+using .Text
 
 end # module
