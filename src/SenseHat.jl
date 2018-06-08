@@ -3,8 +3,9 @@ module SenseHat
 
 export led_matrix, RGB565, led_clear,
     show_char, show_message,
-    Stick, StickEvent, readstick,
-    pressure, temperature, humidity
+    Stick, StickEvent, readstick, sticktask,
+    pressure, temperature, humidity,
+    @colorant_str
 
 
 include("ioctl.jl")

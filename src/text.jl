@@ -1,56 +1,64 @@
 module Text
 
+using ColorTypes, Colors.@colorant_str
+
 import SenseHat.LED: RGB565, led_matrix, led_clear
 
-export show_char, show_message
+export show_char, show_message, @colorant_str
 
 """
-	show_char(c::Char, color::RGB565 = RGB565(1.0,1.0,1.0))
+    show_char(c::Char, color::ColorTypes.AbstractRGB = colorant"white")
 
-Display a single character `c` on the `Sense-Hat` LED Matrix.
+Display a single character `c` on the `SenseHat` LED Matrix.
 """
-function show_char(c::Char, color::RGB565 = RGB565(1.0,1.0,1.0))
-	led_clear()
-	if haskey(font, c)
-		convert(::Type{RGB565}, x::Bool) = x ? color : RGB565(0.0,0.0,0.0)
-		img = hcat(font[c], Bool.(zeros(8, 3)))
-		img = convert.(RGB565, img)
-		led_matrix()[:] = permutedims(img, (2,1))
-	else
-		error("Character font for $c not available \n")
-	end
-	return
+function show_char(c::Char, color::ColorTypes.AbstractRGB = colorant"white")
+    if haskey(font, c)
+        tocolor(b) = b ? RGB565(color) : RGB565(colorant"black")
+        L = PermutedDimsArray(led_matrix(), (2, 1))
+        L[:] .= colorant"black"
+        L[:,2:6] .= tocolor.(font[c])
+    else
+        error("Character font for $c not available \n")
+    end
+    return
 end
 
-
 """
-	show_message(s::String, speed::Real = 0.2, color::RGB565 = RGB565(1.0,1.0,1.0))
+    show_message(s::String, speed::Real = 0.2, color::ColorTypes.AbstractRGB = colorant"white")
 
-Display a scrolling message `s` on the `Sense-Hat` LED Matrix. `speed` is the time in seconds per frame.
+Display a scrolling message `s` on the `SenseHat` LED Matrix. `speed` is the time in seconds per frame and `color` is the color of text.
+
+# Example
+
+```
+using SenseHat
+
+show_message("Hello, World!", 0.2, colorant"purple")
+```
 """
-function show_message(s::String, speed::Real = 0.33, color::RGB565 = RGB565(1.0,1.0,1.0))
-	for c in s
-		if haskey(font, c) == false
-			error("Character font for $c not available \n")
-			return
-		end
-	end
-	convert(::Type{RGB565}, x::Bool) = x ? color : RGB565(0.0,0.0,0.0)
-	led_clear()
-	img = Array{Bool}(8, 16+5*length(s))
-	img[1:8,1:8] = Bool.(zeros(8,8))
-	img[1:8,(8+5*length(s)):(15+5*length(s))] = Bool.(zeros(8,8))
-	for i in 1:length(s)
-		img[1:8, (4 + 5*i):(5*i+8)] = font[s[i]]
-	end
-	for i in 1:(size(img)[2] - 8)
-		frame = convert.(RGB565, img[1:8, i:(i+7)])
-		led_matrix()[:] = permutedims(frame, (2,1))
-		sleep(speed)
-	end
-	led_clear()
-	return	
+function show_message(s::String, speed::Real = 0.2, color::ColorTypes.AbstractRGB = colorant"white")
+    for c in s
+        if haskey(font, c) == false
+            error("Character font for $c not available \n")
+            return
+        end
+        img = Array{Bool}(8, 16 + 5*length(s))
+        img[1:8,1:8] = Bool.(zeros(8,8))
+        img[1:8,(9 + 5*length(s)):(16 + 5*length(s))] = Bool.(zeros(8,8))
+        for i in 1:length(s)
+            img[1:8, (4 + 5*i):(8 + 5*i)] = font[s[i]]
+        end
+        tocolor(b) = b ? color : colorant"black"
+        for i in 1:(size(img,2) - 7)
+            frame = tocolor.(img[1:8, i:(i + 7)])
+            led_matrix()[:] = permutedims(frame, (2,1))
+            sleep(speed)
+        end
+    return
+    end
 end
+
+show_message(s::String, color::ColorTypes.AbstractRGB) = show_message(s, 0.2, color)
 
 font = Dict(' ' => Bool.([0 0 0 0 0 ; 0 0 0 0 0 ; 0 0 0 0 0 ; 0 0 0 0 0 ; 0 0 0 0 0 ; 0 0 0 0 0 ; 0 0 0 0 0 ; 0 0 0 0 0 ; ]),
 '+' => Bool.([0 0 0 0 0 ; 0 0 0 0 0 ; 0 0 1 0 0 ; 0 0 1 0 0 ; 1 1 1 1 1 ; 0 0 1 0 0 ; 0 0 1 0 0 ; 0 0 0 0 0 ; ]),
