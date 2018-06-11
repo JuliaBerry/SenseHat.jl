@@ -85,21 +85,18 @@ end
 
 """
     sticktask()
-
 This is a `Task` that produces `StickEvent`s when the joystick on the Sense HAT is
 manipulated. It will block until new `StickEvent`s occur.
-
 A typical usage will be to create a new task which will call this asynchronously, e.g. the
 following will call the function `f(::StickEvent)` for each event:
-
 ```
 @schedule for e in sticktask()
     f(e)
 end
 ```
-
 """
 function sticktask()
+    Base.depwarn("`sticktask()` is deprecated. Use `Channel` instead to create a buffer of `StickEvent`.", :sticktask)
     @task open(STICK_INPUT_DEVICE) do dev
         fddev = RawFD(fd(dev))
         while true

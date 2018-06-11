@@ -30,10 +30,10 @@ end
 
 
 
-typealias U5 UFixed{UInt8,5}
-typealias U6 UFixed{UInt8,6}
+const U5 = Normed{UInt8,5}
+const U6 = Normed{UInt8,6}
 
-immutable RGB565 <: AbstractRGB{U8}
+immutable RGB565 <: AbstractRGB{Normed{UInt8, 8}}
     data::UInt16
 end
 

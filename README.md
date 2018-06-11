@@ -17,9 +17,9 @@ function for resetting the LED matrix to black.
 
     using SenseHat
     using ColorTypes
-    
+
     const LED = led_matrix()
-    
+
     LED[:] = SenseHat.JULIA_LOGO
     sleep(3)
     led_clear()
@@ -33,17 +33,16 @@ manipulated, returning a `StickEvent`:
 
     e = readstick()
 
-For querying within a loop, `sticktask()` will create a `Task` that produces `StickEvent`s. Use
-with `@schedule` for asynchronous use, e.g.
+For querying within a loop, use a `Channel` to create a buffer of `StickEvent`.
 
     using SenseHat
 
-    @schedule for e in sticktask()
-        println(e)
+    c = Channel{StickEvent}(32)
+
+    @async while true
+        put!(c, readstick())
     end
 
-will create a new task that prints the event, then and add it to the scheduler. See the
-help for `StickEvent` and `sticktask` for more details.
 
 ## Sensors
 
