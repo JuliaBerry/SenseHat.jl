@@ -48,7 +48,7 @@ function show_message(s::String, speed::Real = 0.2, color::ColorTypes.AbstractRG
         for i in 1:length(s)
             img[1:8, (4 + 5*i):(8 + 5*i)] = font[s[i]]
         end
-        tocolor(b) = b ? color : colorant"black"
+        tocolor(b) = b ? RGB565(color) : RGB565(colorant"black")
         for i in 1:(size(img,2) - 7)
             frame = tocolor.(img[1:8, i:(i + 7)])
             led_matrix()[:] = permutedims(frame, (2,1))
