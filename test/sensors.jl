@@ -1,4 +1,4 @@
-using Base.Test
+using Test
 using SenseHat
 
 @test -40 <= temperature() <= 60
