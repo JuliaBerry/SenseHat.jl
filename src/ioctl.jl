@@ -25,7 +25,7 @@ function ioctl(fd::Cint, request::Integer, arg::Integer)
     return ret
 end
 function ioctl(fd::Cint, request::Integer, arg)
-    ret = ccall(:ioctl, Cint, (Cint, Culong, Ptr{Nothing}...), fd, request, arg)
+    ret = ccall(:ioctl, Cint, (Cint, Culong, Ptr{Cvoid}...), fd, request, arg)
     if ret < 0
         throw(SystemError("ioctl error"))
     end
