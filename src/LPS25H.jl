@@ -20,14 +20,16 @@ function LPS25H_pressure()
         smbus_read(CTRL_REG2) == 0 && break # check if finished
     end
 
-    pressure = (Int32(smbus_read(0x2a)) << 16 | Int16(smbus_read(0x29)) << 8 | smbus_read(0x28)) / 4096
+    pressure = (UInt64.(smbus_read(0x2a)) << 16 |
+                UInt64.(smbus_read(0x29)) << 8 |
+                UInt64.(smbus_read(0x28)))/4096.0
 
     smbus_write(CTRL_REG1, 0x00) # power down
     return pressure
 end
 
 """
-    HTS221_temperature()
+    LPS25H_temperature()
 
 The temperature (in °C) from the LPS25H sensor.
 """

@@ -1,5 +1,5 @@
 using SenseHat
-using Base.Test
+using Test
 
 using ColorTypes
 

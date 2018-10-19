@@ -8,7 +8,7 @@ A wrapper around the unix `ioctl` function:
 - `request` is a request code
 
 - `arg` is either an integer (which will be passed as a `Cint`), or a buffer (which will
-  be passed as a `Ptr{Void}`).
+  be passed as a `Ptr{nothing}`).
 
 Will throw a `SystemError` if an error occurs. Otherwise returns a `Cint` (which is
 typically, though not always, 0).
@@ -25,7 +25,7 @@ function ioctl(fd::Cint, request::Integer, arg::Integer)
     return ret
 end
 function ioctl(fd::Cint, request::Integer, arg)
-    ret = ccall(:ioctl, Cint, (Cint, Culong, Ptr{Void}...), fd, request, arg)
+    ret = ccall(:ioctl, Cint, (Cint, Culong, Ptr{Cvoid}...), fd, request, arg)
     if ret < 0
         throw(SystemError("ioctl error"))
     end

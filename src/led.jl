@@ -2,16 +2,16 @@ module LED
 
 import ..ioctl
 
-export led_matrix, RGB565, led_clear
+export led_matrix, RGB565, led_clear, @colorant_str
 
-using ColorTypes, FixedPointNumbers
+using Colors, ColorTypes, FixedPointNumbers, Dates, Mmap
 
 function _led_fb_device()
     try
         for devname in readdir("/sys/class/graphics")
             sysfname = joinpath("/sys/class/graphics",devname,"name")
             if startswith(devname, "fb") && isfile(sysfname)
-                if startswith(readstring(sysfname),"RPi-Sense FB")
+                if startswith(readline(sysfname),"RPi-Sense FB")
                     return joinpath("/dev",devname)
                 end
             end
@@ -28,12 +28,10 @@ function __init__()
     LED_FB_DEVICE[] = open(LED_FB_DEVICE_PATH,"w+")
 end
 
-
-
 const U5 = Normed{UInt8,5}
 const U6 = Normed{UInt8,6}
 
-immutable RGB565 <: AbstractRGB{Normed{UInt8, 8}}
+struct RGB565 <: AbstractRGB{Normed{UInt8, 8}}
     data::UInt16
 end
 
@@ -43,7 +41,7 @@ function RGB565(r::U5, g::U6, b::U5)
             (UInt16(reinterpret(b))) )
 end
 
-RGB565(r::Real, g::Real, b::Real) = 
+RGB565(r::Real, g::Real, b::Real) =
     RGB565(convert(U5,r), convert(U6,g), convert(U5,b))
 RGB565(c::Union{Color,Colorant}) = RGB565(red(c), green(c), blue(c))
 
@@ -51,7 +49,7 @@ ColorTypes.red(c::RGB565) = U5(c.data >> 11, Val{true})
 ColorTypes.green(c::RGB565) = U6((c.data >> 5) & 0x3f, Val{true})
 ColorTypes.blue(c::RGB565) = U5(c.data & 0x1f, Val{true})
 
-ColorTypes.ccolor{Csrc<:Colorant}(::Type{RGB565}, ::Type{Csrc}) = RGB565
+ColorTypes.ccolor(::Type{RGB565}, ::Type{Csrc}) where {Csrc <: Colorant} = RGB565
 ColorTypes.base_color_type(::Type{RGB565}) = RGB565
 
 
@@ -138,7 +136,8 @@ end
 Sets the SenseHat LED matrix to all black.
 """
 function led_clear()
-    led_matrix()[:] = RGB565(0,0,0)
+    led_matrix()[:] .= RGB565(0,0,0)
+    return
 end
 
 end # module

@@ -1,10 +1,11 @@
 module Text
 
-using ColorTypes, Colors.@colorant_str
+using ColorTypes, Colors
 
 import SenseHat.LED: RGB565, led_matrix, led_clear
+import Colors.@colorant_str
 
-export show_char, show_message, @colorant_str
+export show_char, show_message
 
 """
     show_char(c::Char, color::ColorTypes.AbstractRGB = colorant"white")
@@ -42,9 +43,8 @@ function show_message(s::String, speed::Real = 0.2, color::ColorTypes.AbstractRG
             error("Character font for $c not available \n")
             return
         end
-        img = Array{Bool}(8, 16 + 5*length(s))
-        img[1:8,1:8] = Bool.(zeros(8,8))
-        img[1:8,(9 + 5*length(s)):(16 + 5*length(s))] = Bool.(zeros(8,8))
+        img = Array{Bool, 2}(undef, 8, 16 + 5*length(s))
+        img[:] .= 0
         for i in 1:length(s)
             img[1:8, (4 + 5*i):(8 + 5*i)] = font[s[i]]
         end
