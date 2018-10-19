@@ -10,7 +10,7 @@ const I2C_SMBUS_BYTE_DATA  = 0x02
 const I2C_SLAVE  = 0x0703
 const I2C_SMBUS  = 0x0720
 
-immutable SMBusData
+struct SMBusData
     read_write ::UInt8
     command    ::UInt8
     size       ::UInt32

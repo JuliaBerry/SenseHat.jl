@@ -2,12 +2,14 @@ module Stick
 
 export StickEvent, readstick, sticktask
 
+using Dates
+
 function _stick_input_device()
     try
         for devname in readdir("/sys/class/input")
             sysfname = joinpath("/sys/class/input",devname,"device","name")
             if startswith(devname, "event") && isfile(sysfname)
-                if startswith(readstring(sysfname),"Raspberry Pi Sense HAT Joystick")
+                if startswith(readline(sysfname),"Raspberry Pi Sense HAT Joystick")
                     return joinpath("/dev/input",devname)
                 end
             end
@@ -30,7 +32,7 @@ const EV_KEY = Cushort(0x01)
 
 The raw data format from the input device. This is based on the struct specification from https://github.com/RPi-Distro/python-sense-hat/blob/ec8c96118d5eb58488c4ff6091cd373117e6ce08/sense_hat/stick.py#L41.
 """
-immutable StickEventRaw
+struct StickEventRaw
     tv_sec::Clong
     tv_usec::Clong
     ev_type::Cushort
@@ -53,7 +55,7 @@ The data from a joystick event. The type contains the following fields:
 * `state` : the state of the event (`PRESS`, `RELEASE`, `HOLD`).
 
 """
-immutable StickEvent
+struct StickEvent
     timestamp::DateTime
     direc::Direc
     state::State
@@ -61,7 +63,7 @@ end
 
 Base.convert(::Type{StickEvent}, r::StickEventRaw) =
     StickEvent(Dates.unix2datetime(r.tv_sec + r.tv_usec/1_000_000),
-               Direc(r.ev_direc), State(r.ev_state))
+Direc(r.ev_direc), State(r.ev_state))
 
 """
     readstick()
@@ -75,9 +77,9 @@ function readstick()
         fddev = RawFD(fd(dev))
         while true
             wait(fddev, readable=true)
-            s = read(dev, StickEventRaw)
+            s = read!(dev, Ref{StickEventRaw}())[]
             if s.ev_type == EV_KEY
-                return StickEvent(s)
+                return convert(StickEvent,s)
             end
         end
     end
@@ -101,9 +103,9 @@ function sticktask()
         fddev = RawFD(fd(dev))
         while true
             wait(fddev, readable=true)
-            s = read(dev, StickEventRaw)
+            s = read(dev, Ref{StickEventRaw}())[]
             if s.ev_type == EV_KEY
-                produce(StickEvent(s))
+                produce(convert(StickEvent, s))
             end
         end
     end
