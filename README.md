@@ -4,9 +4,11 @@ SenseHat.jl is a Julia library for interacting with the Raspberry Pi [Sense HAT]
 
 SenseHat.jl requires the Raspbian `sense-hat` package:
 
-    sudo apt-get update
-    sudo apt-get install sense-hat
-    sudo reboot
+```bash
+sudo apt-get update
+sudo apt-get install sense-hat
+sudo reboot
+```
 
 ## LED matrix
 
@@ -15,34 +17,39 @@ values (from [ColorTypes.jl](https://github.com/JuliaGraphics/ColorTypes.jl)) wh
 memory-mapped to the frame buffer of the LED matrix. `led_clear()` is a convenience
 function for resetting the LED matrix to black.
 
-    using SenseHat
-    using ColorTypes
+```julia
+using SenseHat
+using ColorTypes
 
-    const LED = led_matrix()
+const LED = led_matrix()
 
-    LED[:] = SenseHat.JULIA_LOGO
-    sleep(3)
-    led_clear()
+LED[:] = SenseHat.JULIA_LOGO
+sleep(3)
+led_clear()
+```
 
 ## Joystick
 
 In the `Stick` module there is `readstick()` which will block until the joystick is
 manipulated, returning a `StickEvent`:
 
-    using SenseHat
+```julia
+using SenseHat
 
-    e = readstick()
+e = readstick()
+```
 
 For querying within a loop, use a `Channel` to create a buffer of `StickEvent`.
 
-    using SenseHat
+```julia
+using SenseHat
 
-    c = Channel{StickEvent}(32)
+c = Channel{StickEvent}(32)
 
-    @async while true
-        put!(c, readstick())
-    end
-
+@async while true
+    put!(c, readstick())
+end
+```
 
 ## Sensors
 
