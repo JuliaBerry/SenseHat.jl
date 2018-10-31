@@ -7,12 +7,12 @@ const JULIA_LOGO = begin
     p = RGB565(0.667,0.475,0.757)
     z = RGB565(0.0,0.0,0.0)
 
-    permutedims([z z z z z z z z;
-                 z z z G G z z z;
-                 z z G g g G z z;
-                 z z G g g G z z;
-                 z R R G G P P z;
-                 R r r R P p p P;
-                 R r r R P p p P;
-                 z R R z z P P z], (2,1)) # transpose to correct orientation
+    [z z z z z z z z;
+     z z z G G z z z;
+     z z G g g G z z;
+     z z G g g G z z;
+     z R R G G P P z;
+     R r r R P p p P;
+     R r r R P p p P;
+     z R R z z P P z]; # transpose to correct orientation
 end
