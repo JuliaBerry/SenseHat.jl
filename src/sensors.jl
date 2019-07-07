@@ -7,8 +7,12 @@ const I2C_DEVICE = Ref{IOStream}()
 const I2C_ADDR = Ref{UInt8}(0xff)
 
 function __init__()
-    I2C_DEVICE[] = open("/dev/i2c-1","r+")
-    HTS221_calibrate()
+    try
+        I2C_DEVICE[] = open("/dev/i2c-1","r+")
+        HTS221_calibrate()
+    catch
+        @warn("I2C: Sense Hat not found")
+    end
 end
 
 import ..ioctl

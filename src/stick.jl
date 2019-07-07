@@ -15,8 +15,10 @@ function _stick_input_device()
             end
         end
     catch e
+        @warn("STICK: Sense Hat not found.")
+        return nothing
     end
-    error("Sense Hat not found.")
+
 end
 
 const STICK_INPUT_DEVICE = _stick_input_device()

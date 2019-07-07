@@ -17,15 +17,18 @@ function _led_fb_device()
             end
         end
     catch e
+        @warn("LED: Sense Hat not found.")
+        return nothing
     end
-    error("Sense Hat device not found.")
 end
 
 const LED_FB_DEVICE_PATH = _led_fb_device()
 const LED_FB_DEVICE = Ref{IOStream}()
 
 function __init__()
-    LED_FB_DEVICE[] = open(LED_FB_DEVICE_PATH,"w+")
+    if LED_FB_DEVICE_PATH != nothing
+        LED_FB_DEVICE[] = open(LED_FB_DEVICE_PATH,"w+")
+    end
 end
 
 const U5 = Normed{UInt8,5}
