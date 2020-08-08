@@ -1,9 +1,9 @@
 # SenseHat.jl
 
-[![][docs-stable-img]][docs-stable-url]
+[![version](https://juliahub.com/docs/SenseHat/version.svg)](https://juliahub.com/ui/Packages/SenseHat/EDH84) [![][docs-stable-img]][docs-stable-url]
 
 [docs-stable-img]: https://img.shields.io/badge/docs-stable-blue.svg
-[docs-stable-url]: https://pkg.julialang.org/docs/SenseHat/
+[docs-stable-url]: https://juliahub.com/docs/SenseHat/EDH84
 
 
 SenseHat.jl is a Julia library for interacting with the Raspberry Pi [Sense HAT](https://www.raspberrypi.org/products/sense-hat/).
