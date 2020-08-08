@@ -58,9 +58,12 @@ ColorTypes.base_color_type(::Type{RGB565}) = RGB565
 
 
 """
-    led_matrix()
+    led_matrix(orientation::Symbol)
 
-Returns an 8x8 matrix of `RGB565` elements that is memory-mapped to the Sense HAT LED Matrix.
+Returns an 8x8 matrix view of `RGB565` elements that is memory-mapped to the Sense HAT LED Matrix.
+
+Orientation can be set to: default, right, left, invert
+See the example below for usage
 
 While it is possible to invoke the function multiple times (each returning different
 arrays), it is generally preferable to assign it once into a `const` variable so as to
@@ -69,18 +72,31 @@ minimise the number of open file handlers.
 # Example
 
 ```
-using SenseHat
-using ColorTypes
-
 const LED = led_matrix()
 
 LED[:] = SenseHat.JULIA_LOGO
 sleep(3)
-LED[:] = RGB(0,0,0)
+LED[:] .= colorant"blue"
+
+# Make the display upside-down, top points to HDMI connector
+const LED2 = led_matrix(:invert) # Make the display upside-down, top points to HDMI connector
+LED2[:] = SenseHat.JULIA_LOGO
+sleep(3)
+LED2 .= colorant"black"
 ```
 
 """
-led_matrix() = Mmap.mmap(LED_FB_DEVICE[], Array{RGB565,2}, (8,8); grow=false)
+led_matrix(orientation::Symbol) = led_matrix(Val{orientation})
+
+led_matrix() = led_matrix(:default)
+led_matrix(::Type{Val{:default}}) = @view PermutedDimsArray(Mmap.mmap(LED_FB_DEVICE[],
+    Array{RGB565,2}, (8,8); grow=false),(2,1))[:,:];
+led_matrix(::Type{Val{:right}}) = @view Mmap.mmap(LED_FB_DEVICE[],
+    Array{RGB565,2}, (8,8); grow=false)[8:-1:1,:];
+led_matrix(::Type{Val{:left}}) = @view Mmap.mmap(LED_FB_DEVICE[],
+    Array{RGB565,2}, (8,8); grow=false)[:,8:-1:1];
+led_matrix(::Type{Val{:invert}}) = @view PermutedDimsArray(Mmap.mmap(LED_FB_DEVICE[],
+    Array{RGB565,2}, (8,8); grow=false),(2,1))[8:-1:1,8:-1:1];
 
 
 
