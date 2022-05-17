@@ -3,6 +3,9 @@
 
 using SenseHat
 
+# an 8x8 matrix of `RGB565` elements that is memory-mapped to the Sense HAT LED Matrix
+LED = led_matrix()
+
 # Create channel to store stick events
 c = Channel{StickEvent}(32)
 @async while true
