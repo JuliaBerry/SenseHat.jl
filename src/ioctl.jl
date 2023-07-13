@@ -33,5 +33,5 @@ function ioctl(fd::Cint, request::Integer, arg)
 end
 
 ioctl(f::Union{Base.Filesystem.File, IOStream}, request::Integer, arg) =
-    ioctl(fd(f), request, arg)
+    ioctl(Cint(fd(f)), request, arg)
     
